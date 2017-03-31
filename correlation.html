@@ -50,7 +50,7 @@ sumX2 = 0;
 sumY2 = 0;
 n = points.length;
 points.forEach(function(element,index,array){
-		ctx.fillRect(element[0],element[1],10,10);
+		ctx.fillRect(element[0]-pointwidth/2,element[1]-pointwidth/2,10,10);
 		sumX+=element[0];
 		sumY+=element[1];
 		sumXY+=element[0] * element[1];
@@ -91,7 +91,7 @@ ctx.fillText("lineM: " + -lineM.toFixed(2),10,70);
 c.addEventListener('click', function(event) {
 var x = event.pageX-cLeft,
 y = event.pageY - cTop;
-points.push([x-pointwidth/2,y-pointwidth/2]);
+points.push([x,y]);
 draw();
 drawLine();
 printScreen();

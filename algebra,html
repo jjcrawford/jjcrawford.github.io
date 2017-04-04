@@ -1,0 +1,187 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Open Sans">
+	<style>
+		td {background-color: #eeeeee; color:#0000ff; text-align:center; font-family:'Open sans';}
+		.titleCell{background-color:#dddddd; color:#0000ff;}
+		.attributeCell{background-color:#eaeaea; color:#ff0000; text-align:left;}
+		.operatorCell{background-color:#eaeaea; color:#000000; font-weight:bold;}
+		.MAttr {background-color: #ffff22; color:#000000; width:20px;}
+		.YAttr {background-color: #00ff00; color:#000000; width:20px;}
+		.NAttr {background-color: #ff9999; color:#000000; width:20px;}
+	</style>
+
+</head>
+<body>
+<h3> Algebraic structures of one set and either one or two binary operators. </h3>
+</body>
+</html>
+
+<script>
+
+function mergeAttributes(a1, a2){ //a2 is prioritised
+	var output =[];
+	for (var index in a1){
+		output[index] = a1[index];
+	}
+	for (var index in a2){
+		if (a2[index]=="unnecessary" && typeof output[index] != 'undefined') delete output[index];
+		else {
+			output[index] = a2[index];
+		}
+	}
+	return output;
+}
+
+function toTitleCase(str)
+{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
+/*class Structure {
+	constructor(StructurePrototype, sets, 
+}
+
+class Operator {
+	constructor(operatorPrototype, specialElems){
+		this.name = name;
+		this.attributes = attributes;
+	}
+}*/
+
+class AbstractSet {
+	constructor(name, setAttributes){
+		this.name = name;
+		this.setAttributes = setAttributes;
+	}
+}
+
+class StructurePrototype {
+	constructor(name, operatorPrototypes, numsets, connectionSchema){
+		this.name = name;
+		this.operatorPrototypes = operatorPrototypes;
+		this.numsets = numsets;
+		this.connectionSchema = connectionSchema;
+	}
+	
+	newWithModifications(name, operatorAttributeChanges, numsetschanges, connectionSchemaChanges) {
+		var opProtos = [];
+		if (typeof numsetschanges == 'undefined') numsetschanges = 0;
+		for (var i=0; i<this.operatorPrototypes.length; i++){
+			var tempAttrs = [];
+			
+			for (var index in this.operatorPrototypes[i].attributes){
+				tempAttrs[index] = this.operatorPrototypes[i].attributes[index];
+			}
+			
+			opProtos.push(new OperatorPrototype(this.operatorPrototypes[i].name, this.operatorPrototypes[i].sign, tempAttrs));
+		}
+		for (i=0; i<operatorAttributeChanges.length;i++){
+			if (i<opProtos.length){
+				opProtos[i].attributes = mergeAttributes(opProtos[i].attributes, operatorAttributeChanges[i]);
+			} else {
+				opProtos[i] = new OperatorPrototype(operatorAttributeChanges[i]['name'], operatorAttributeChanges[i]['sign'], operatorAttributeChanges[i]['attributes']);
+			}
+		}
+		return new StructurePrototype(name, opProtos, this.numsets+numsetschanges, connectionSchemaChanges); //abstract connection schemas
+	}
+}
+
+class OperatorPrototype {
+	constructor(name, sign, attributes, opProto){ //I forget alternate use
+		this.name = name;
+		this.sign = sign;
+		this.attributes = attributes;
+	}
+}
+
+const set = new StructurePrototype("set",[],1);
+const magma = set.newWithModifications("magma", [{name:"addition", sign:"+", attributes:{closed:true}}]);
+//const magma = new StructurePrototype("magma",[
+//	new OperatorPrototype("addition", "+", {closed:true})], 1); 
+const semigroup = magma.newWithModifications("semigroup", [{associative: true}]);
+const monoid = semigroup.newWithModifications("monoid", [{identity: true}]);	
+const group = monoid.newWithModifications("group", [{inverse: true}]);	
+const abeliangroup = group.newWithModifications("abelian group", [{commutative:true}]);
+
+const ring = abeliangroup.newWithModifications("ring", [{distributive:true},{name:"multiplication", sign:"×", attributes:mergeAttributes(semigroup.operatorPrototypes[0].attributes,{distributive:true})}])
+const semiring = ring.newWithModifications("semiring (rig)", [{inverse: "unnecessary"},[]])
+const divisionring = ring.newWithModifications("division ring", [[],{inverse: "nonzero", identity: true}]);
+
+const unitring = ring.newWithModifications("unit ring", [[],{identity:true}]);
+const commutativering = ring.newWithModifications("commutative ring", [[],{commutative:true}]);
+
+
+const field = divisionring.newWithModifications("field", [[],{commutative:true}]);
+
+
+
+function tabulateStructurePrototype(structurePrototype){
+	var body = document.getElementsByTagName('body')[0];
+    var tbl = document.createElement('table');
+    //tbl.style.width = '100%';
+    tbl.setAttribute('border', '0');
+    var tbdy = document.createElement('tbody');
+	var opProtos = structurePrototype.operatorPrototypes;
+	var attributeList = [];
+	for (var i=0; i<opProtos.length; i++){
+		attributeList = mergeAttributes(attributeList,opProtos[i].attributes);
+	}
+	
+	var columnHeading = document.createElement('tr');
+	var titleCell = document.createElement('td');
+	titleCell.className="titleCell";
+	titleCell.appendChild(document.createTextNode(toTitleCase(structurePrototype.name)));
+	columnHeading.appendChild(titleCell);
+	for (var j=0; j<opProtos.length; j++){
+			var td = document.createElement('td');
+			td.appendChild(document.createTextNode(opProtos[j].sign));
+			td.className="operatorCell";
+			columnHeading.appendChild(td);
+	}
+	tbdy.appendChild(columnHeading);
+	
+	for (var index in attributeList) {
+        var tr = document.createElement('tr');
+		var attrTitleCell = document.createElement('td');
+		attrTitleCell.appendChild(document.createTextNode(toTitleCase(index)));
+		attrTitleCell.className="attributeCell";
+		tr.appendChild(attrTitleCell);
+        for (var j = 0; j<opProtos.length; j++) {
+            var td = document.createElement('td');
+			if (opProtos[j].attributes[index] == true) {
+				td.className="YAttr";
+				td.appendChild(document.createTextNode("✓"));
+			} else if (opProtos[j].attributes[index] == "nonzero"){
+				td.className="YAttr";
+				td.appendChild(document.createTextNode("Ø"));
+			} else if (opProtos[j].attributes[index] == false) {
+				td.className = "NAttr";
+				td.appendChild(document.createTextNode("✘"));
+			} else {
+				td.className = "MAttr";
+				td.appendChild(document.createTextNode("•"));
+			}
+			tr.appendChild(td);
+        }
+        tbdy.appendChild(tr);
+    }
+	
+    tbl.appendChild(tbdy);
+    body.appendChild(tbl)
+}
+
+tabulateStructurePrototype(magma);
+tabulateStructurePrototype(semigroup);
+tabulateStructurePrototype(monoid);
+tabulateStructurePrototype(group);
+tabulateStructurePrototype(abeliangroup);
+tabulateStructurePrototype(ring);
+document.getElementsByTagName('body')[0].appendChild(document.createTextNode("(NB: Wikipedia and Wolfram MathWorld disagree on whether having a multiplicative identity is a ring axiom. Wikipedia states that it is, and that a ring forms a monoid over multiplication. MathWorld and a few other sources state that it does not, which means a ring must form a semigroup over multiplication. David claimed in class that 2ℤ is a ring, so David also contradicts Wikipedia.)"));
+tabulateStructurePrototype(semiring);
+tabulateStructurePrototype(divisionring);
+tabulateStructurePrototype(unitring);
+tabulateStructurePrototype(commutativering);
+tabulateStructurePrototype(field);
+
+</script>

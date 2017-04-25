@@ -9,11 +9,16 @@
 		.MAttr {background-color: #ffff22; color:#000000; width:20px;}
 		.YAttr {background-color: #00ff00; color:#000000; width:20px;}
 		.NAttr {background-color: #ff9999; color:#000000; width:20px;}
+		
+		.setCell{background-color:#dddddd; color:#0000ff;}
+		.strucProtoCell{vertical-align:top; border-width:0px; padding:0px; background-color:#f5f5f5;}
+		
+		.innerDiv{top:0px; width:100%; height:100%; align:top; margin:0px;}
+		.bonusTextCell{font-size:12px; word-wrap:break-word;}
 	</style>
 
 </head>
 <body>
-<h3> Algebraic structures of one set and either one or two binary operators. </h3>
 </body>
 </html>
 
@@ -116,7 +121,7 @@ const field = divisionring.newWithModifications("field", [[],{commutative:true}]
 
 
 
-function tabulateStructurePrototype(structurePrototype){
+function tabulateStructurePrototype(structurePrototype, silent){
 	var body = document.getElementsByTagName('body')[0];
     var tbl = document.createElement('table');
     //tbl.style.width = '100%';
@@ -137,7 +142,9 @@ function tabulateStructurePrototype(structurePrototype){
 			var td = document.createElement('td');
 			td.appendChild(document.createTextNode(opProtos[j].sign));
 			td.className="operatorCell";
-			columnHeading.appendChild(td);
+			//td.style.paddingTop="0px";		
+			columnHeading.appendChild(td);			
+			
 	}
 	tbdy.appendChild(columnHeading);
 	
@@ -146,6 +153,11 @@ function tabulateStructurePrototype(structurePrototype){
 		var attrTitleCell = document.createElement('td');
 		attrTitleCell.appendChild(document.createTextNode(toTitleCase(index)));
 		attrTitleCell.className="attributeCell";
+		if (typeof silent!==undefined) {
+			if (silent) {
+				attrTitleCell.style.paddingLeft="0px";					
+			}
+		}
 		tr.appendChild(attrTitleCell);
         for (var j = 0; j<opProtos.length; j++) {
             var td = document.createElement('td');
@@ -168,9 +180,80 @@ function tabulateStructurePrototype(structurePrototype){
     }
 	
     tbl.appendChild(tbdy);
-    body.appendChild(tbl)
+	if (typeof silent!==undefined) {
+		if (silent) {
+			tbl.style.padding="0px";
+			return tbl;
+			
+		}
+		else body.appendChild(tbl);
+	} else {body.appendChild(tbl);}
 }
 
+function tabulateSuperstructurePrototype(name, strucProtos, setNames, bonusText){
+	var body = document.getElementsByTagName('body')[0];
+    var tbl = document.createElement('table');
+    //tbl.style.width = '100%';
+    tbl.setAttribute('border', '0');
+    var tbdy = document.createElement('tbody');
+	
+	var columnHeading = document.createElement('tr');
+	var titleCell = document.createElement('td');
+	titleCell.colSpan = setNames.length;
+	titleCell.className="titleCell";
+	titleCell.appendChild(document.createTextNode(toTitleCase(name)));
+	columnHeading.appendChild(titleCell);
+	var setHeading = document.createElement('tr');
+	for (var j=0; j<setNames.length; j++){
+			var td = document.createElement('td');
+			td.appendChild(document.createTextNode(setNames[j]));
+			td.className="setCell";
+			setHeading.appendChild(td);
+	}
+	tbdy.appendChild(columnHeading);
+	tbdy.appendChild(setHeading);
+	
+	var strucTr = document.createElement('tr');
+	for (var j = 0; j<strucProtos.length; j++) {
+		var td = document.createElement('td');
+		td.className = "strucProtoCell";
+		var div = document.createElement('div');
+		div.className = "innerDiv";
+		var subtable = tabulateStructurePrototype(strucProtos[j],true);
+		div.appendChild(subtable);
+		td.appendChild(div);
+		strucTr.appendChild(td);
+		
+	}
+	tbdy.appendChild(strucTr);
+	
+	if (typeof bonusText !== undefined){
+		if (bonusText!=""){
+			var bonusTr = document.createElement('tr');
+			var bonusTd = document.createElement('td');
+			bonusTd.className="bonusTextCell";
+			var args = bonusText.split("\n");
+			for (i = 0; i < args.length; i++) {
+				bonusTd.appendChild(document.createTextNode(args[i]));
+				if (i!=args.length-1) bonusTd.appendChild(document.createElement("br"));
+			}
+			//textNode.nodeValue=textNode.nodeValue.replace("\n","<br/>");
+			//bonusTd.appendChild(textNode);
+			bonusTd.colSpan = setNames.length;
+			bonusTr.appendChild(bonusTd);
+			tbdy.appendChild(bonusTr);
+		}
+	}
+	
+    tbl.appendChild(tbdy);
+	body.appendChild(tbl);
+}
+
+function ReplaceAll(str, find, replace) {
+    return str.replace(new RegExp(find, 'g'), replace);
+}
+
+document.getElementsByTagName('body')[0].innerHTML+="<h3> Algebraic structures of one set and either one or two binary operators: </h3>";
 tabulateStructurePrototype(magma);
 tabulateStructurePrototype(semigroup);
 tabulateStructurePrototype(monoid);
@@ -183,5 +266,11 @@ tabulateStructurePrototype(divisionring);
 tabulateStructurePrototype(unitring);
 tabulateStructurePrototype(commutativering);
 tabulateStructurePrototype(field);
+
+document.getElementsByTagName('body')[0].innerHTML+="</br><h3> Algebraic structures of two sets:</h3>";
+tabulateSuperstructurePrototype("Module",[ring,abeliangroup],["R","M"],"Modules also have a \n scalar multiple operation R×M→M or M×R→M");
+document.getElementsByTagName('body')[0].appendChild(document.createTextNode("(NB: Modules are called 'left R-modules' if scalar multiplication with R acts on the module from the left, and 'right R-modules' if scalar multiplication with R acts on the right.)"));
+
+tabulateSuperstructurePrototype("Vector Space",[field,abeliangroup],["R","V"],"Vector Spaces also have a \n scalar multiple operation R×M→M");
 
 </script>

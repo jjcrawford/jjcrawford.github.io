@@ -255,8 +255,11 @@ function ReplaceAll(str, find, replace) {
 
 document.getElementsByTagName('body')[0].innerHTML+="<h3> Algebraic structures of one set and either one or two binary operators: </h3>";
 tabulateStructurePrototype(magma);
+	document.getElementsByTagName('body')[0].innerHTML+="Eg. The set of all binary trees with an operation which joins both trees at a common point.";
 tabulateStructurePrototype(semigroup);
+	document.getElementsByTagName('body')[0].innerHTML+="Eg. The set of all non-empty strings with the concatenation operation.";
 tabulateStructurePrototype(monoid);
+	document.getElementsByTagName('body')[0].innerHTML+="Eg. The set of all strings with the concatenation operation.";
 tabulateStructurePrototype(group);
 tabulateStructurePrototype(abeliangroup);
 tabulateStructurePrototype(ring);

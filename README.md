@@ -1,2 +1,2 @@
 # jjcrawford.github.io
-A misc web toy playground.
+Just using this to host little snippets

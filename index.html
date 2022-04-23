@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+		<head>
+				<script src="jquery-3.6.0.min.js"></script>
+		</head>
+<body>
+Most recently played: <span id="birdlabel">None</span></br>
+</br>
+<button onclick="playRandom()" type="button">Play random bird-call</button>
+<button onclick="stopAudio()" type="button">Stop current audio</button>
+</br>
+</br>
+Yellow-Tailed Black Cockatoo:</br>
+<audio controls id="audio0">
+  <source src="black_cockatoo_yellow_tailed.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio> </br></br>
+
+Superb Fairywren:</br>
+<audio controls id="audio1">
+  <source src="superb_fairywren.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+</br></br>
+
+Red-Rumped Parrot:</br>
+<audio controls id="audio2">
+  <source src="red-rumped_parrot.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+</br></br>
+
+Noisy Miner:</br>
+<audio controls id="audio3">
+  <source src="noisy_miner.mp3" type="audio/mpeg">
+Your browser does not support the audio element.
+</audio>
+
+
+<script>
+var currentAudio = 0;
+
+var labels = ["Yellow-Tailed Black Cockatoo", "Superb Fairywren", "Red-Rumped Parrot", "Noisy Miner"];
+
+function playRandom() {
+		// play random
+		var newAudio = Math.floor(Math.random() * 4);
+		if (newAudio != currentAudio) stopAudio();
+
+		
+		currentAudio = newAudio;
+		$("#audio" + currentAudio).animate({volume: 1}, 1000);
+		$("#audio" + currentAudio)[0].currentTime = 0;
+		$("#audio" + currentAudio)[0].play();
+		$("#birdlabel")[0].innerText = labels[currentAudio];
+} 
+
+function stopAudio() {
+		//fade out
+				var x = currentAudio;
+				var prevVol = $("#audio" + currentAudio)[0].volume;
+				$("#audio" + currentAudio).animate({volume: 0}, 1000, function() {
+		$("#audio" + x)[0].pause();
+		$("#audio" + x)[0].volume = prevVol;
+		$("#audio" + x)[0].currentTime = 0;
+						});
+}
+
+</script>
+
+</body>
+</html>
+
+

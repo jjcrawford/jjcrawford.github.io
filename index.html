@@ -7,7 +7,7 @@
 Most recently played: <span id="birdlabel">None</span></br>
 </br>
 <button onclick="playRandom()" type="button">Play random bird-call</button>
-<button onclick="stopAudio()" type="button">Stop current audio</button>
+<button onclick="stopAudio()" type="button">Stop the random audio</button>
 </br>
 </br>
 Yellow-Tailed Black Cockatoo:</br>
@@ -38,6 +38,7 @@ Your browser does not support the audio element.
 
 
 <script>
+var prevPrev = 1;
 var currentAudio = 0;
 
 var labels = ["Yellow-Tailed Black Cockatoo", "Superb Fairywren", "Red-Rumped Parrot", "Noisy Miner"];
@@ -45,9 +46,10 @@ var labels = ["Yellow-Tailed Black Cockatoo", "Superb Fairywren", "Red-Rumped Pa
 function playRandom() {
 		// play random
 		var newAudio = Math.floor(Math.random() * 4);
+		while (newAudio == currentAudio & currentAudio == prevPrev) newAudio = Math.floor(Math.random() * 4);
 		if (newAudio != currentAudio) stopAudio();
 
-		
+		prevPrev = currentAudio;	
 		currentAudio = newAudio;
 		$("#audio" + currentAudio).animate({volume: 1}, 1000);
 		$("#audio" + currentAudio)[0].currentTime = 0;
@@ -57,15 +59,13 @@ function playRandom() {
 
 function stopAudio() {
 		//fade out
-			//	var x = currentAudio;
-		for (var x = 0; x < 4; x++) {
+				var x = currentAudio;
 				var prevVol = $("#audio" + currentAudio)[0].volume;
 				$("#audio" + currentAudio).animate({volume: 0}, 1000, function() {
 		$("#audio" + x)[0].pause();
-		$("#audio" + x)[0].volume = prevVol;
 		$("#audio" + x)[0].currentTime = 0;
+		$("#audio" + x)[0].volume = prevVol;
 						});
-				}
 }
 
 </script>

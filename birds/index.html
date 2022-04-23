@@ -57,13 +57,15 @@ function playRandom() {
 
 function stopAudio() {
 		//fade out
-				var x = currentAudio;
+			//	var x = currentAudio;
+		for (var x = 0; x < 4; x++) {
 				var prevVol = $("#audio" + currentAudio)[0].volume;
 				$("#audio" + currentAudio).animate({volume: 0}, 1000, function() {
 		$("#audio" + x)[0].pause();
 		$("#audio" + x)[0].volume = prevVol;
 		$("#audio" + x)[0].currentTime = 0;
 						});
+				}
 }
 
 </script>
